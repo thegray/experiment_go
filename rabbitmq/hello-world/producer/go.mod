@@ -1,4 +1,4 @@
-module experiment/rabbitmq/hello-world/producer
+module experiment_go/rabbitmq/hello-world/producer
 
 go 1.17
 

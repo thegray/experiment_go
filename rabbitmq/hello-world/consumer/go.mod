@@ -1,4 +1,4 @@
-module experiment/rabbitmq/hello-world/consumer
+module experiment_go/rabbitmq/hello-world/consumer
 
 go 1.17
 

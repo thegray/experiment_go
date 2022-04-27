@@ -1,4 +1,4 @@
-module experiment/rabbitmq/3_pubsub
+module experiment_go/rabbitmq/3_pubsub
 
 go 1.17
 

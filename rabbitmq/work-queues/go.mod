@@ -1,4 +1,4 @@
-module experiment/rabbitmq/work-queues
+module experiment_go/rabbitmq/work-queues
 
 go 1.17
 

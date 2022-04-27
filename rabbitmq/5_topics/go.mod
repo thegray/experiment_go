@@ -1,4 +1,4 @@
-module experiment/rabbitmq/4_routing
+module experiment_go/rabbitmq/4_routing
 
 go 1.17
 
