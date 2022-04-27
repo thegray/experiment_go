@@ -14,14 +14,14 @@ func failOnError(err error, msg string) {
 }
 
 var (
-	ExchangeName    = "aaaa"
+	ExchangeName    = "direct1"
 	ExchangeType    = "direct"
 	ExchangeDurable = true
-	RoutingKey      = "zzzz"
-	MandatoryFlag   = true
-	ImmediateFlag   = true
+	RoutingKey      = "routing1"
+	MandatoryFlag   = false
+	ImmediateFlag   = false
 	Q_ADDRESS       = "amqp://guest:guest@localhost:5672/"
-	QueName         = "que1"
+	QueName         = "que1" // for round robin between consumers, should use named que
 )
 
 type Conn struct {
@@ -41,36 +41,53 @@ func setupQueConn(rabbitURL string) (Conn, error) {
 		return Conn{}, err
 	}
 
+	err = ch.ExchangeDeclare(
+		ExchangeName,    // name
+		ExchangeType,    // type
+		ExchangeDurable, // durable
+		false,           // auto-deleted
+		false,           // internal
+		false,           // no-wait
+		nil,             // arguments
+	)
+	if err != nil {
+		log.Printf("Failed to declare an exchange with name: %s", ExchangeName)
+		return Conn{}, err
+	}
+
 	_, err = ch.QueueDeclare(
-		QueName, // name
-		true,    // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		QueName,         // name
+		ExchangeDurable, // durable
+		false,           // delete when unused
+		false,           // exclusive
+		false,           // no-wait
+		nil,             // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Printf("Failed to declare a queue with name: %s", QueName)
+		return Conn{}, err
+	}
 
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
-
-	// err = ch.ExchangeDeclare(
-	// 	ExchangeName,    // name
-	// 	ExchangeType,    // type
-	// 	ExchangeDurable, // durable
-	// 	false,           // auto-deleted
-	// 	false,           // internal
-	// 	false,           // no-wait
-	// 	nil,             // arguments
+	// err = ch.Qos(
+	// 	1,     // prefetch count
+	// 	0,     // prefetch size
+	// 	false, // global
 	// )
 	// if err != nil {
-	// 	log.Printf("Failed to declare an exchange with name: %s", ExchangeName)
+	// 	log.Printf("Failed to set up Qos")
 	// 	return Conn{}, err
 	// }
+
+	err = ch.QueueBind(
+		QueName,      // queue name
+		RoutingKey,   // routing key
+		ExchangeName, // exchange
+		false,
+		nil)
+	if err != nil {
+		log.Printf("Failed to bind queue, routing, exchange (%s %s %s)", QueName, RoutingKey, ExchangeName)
+		return Conn{}, err
+	}
 
 	return Conn{
 		Channel: ch,

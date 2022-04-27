@@ -17,14 +17,15 @@ func failOnError(err error, msg string) {
 
 // server config
 var (
-	ExchangeName    = "aaaa"
+	ExchangeName    = "direct1"
 	ExchangeType    = "direct"
 	ExchangeDurable = true
-	RoutingKey      = "zzzz"
-	MandatoryFlag   = true
-	ImmediateFlag   = true
+	RoutingKey      = "routing1"
+	MandatoryFlag   = false
+	ImmediateFlag   = false
 	Q_ADDRESS       = "amqp://guest:guest@localhost:5672/"
-	HTTP_PORT       = ":8000"
+
+	HTTP_PORT = ":8000"
 )
 
 type Conn struct {
@@ -80,29 +81,10 @@ func (conn Conn) publish(data string) error {
 		})
 }
 
-// func queSetup() {
-// 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-// 	failOnError(err, "Failed to get Rabbit Channel")
-// 	defer conn.Close()
-
-// 	ch, err := conn.Channel()
-// 	failOnError(err, "Failed to open a channel")
-// 	defer ch.Close()
-
-// 	q, err := ch.QueueDeclare(
-// 		"task_queue", // name
-// 		true,         // durable
-// 		false,        // delete when unused
-// 		false,        // exclusive
-// 		false,        // no-wait
-// 		nil,          // arguments
-// 	)
-// 	failOnError(err, "Failed to declare a queue")
-// }
-
 func main() {
 	conn, err := setupQueConn(Q_ADDRESS)
 	failOnError(err, "Failed to connect to RabbitMQ")
+	defer conn.Channel.Close()
 
 	svc := Service{QueCon: &conn}
 
@@ -131,5 +113,4 @@ func (svc Service) PostMessage(c echo.Context) error {
 	svc.QueCon.publish(msg.Msg)
 	log.Printf("message queued")
 	return c.JSON(http.StatusOK, Message{Msg: "we got your message: " + msg.Msg})
-	// return c.String(http.StatusOK)
 }
