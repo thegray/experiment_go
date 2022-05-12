@@ -1,4 +1,4 @@
-module kafka_exp/producer_example
+module experiment_go/kafka/producer_example
 
 go 1.17
 

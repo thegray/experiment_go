@@ -1,4 +1,4 @@
-module kafka_exp/consumer_example
+module experiment_go/kafka/consumer_example
 
 go 1.17
 
