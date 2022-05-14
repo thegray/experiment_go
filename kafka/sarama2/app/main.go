@@ -42,11 +42,11 @@ func main() {
 	serverCfg := conf.GetGlobalConfig().ServerConfig
 	saramaCfg := conf.GetGlobalConfig().SaramaConfig
 
-	sp := kafka.NewProducer(saramaCfg)
+	kafkaProducer := kafka.NewProducer(saramaCfg)
 
 	httpServer := transport.NewServer(serverCfg)
 	api.HealthCheck(httpServer.Engine())
-	api.Demo(httpServer.Engine(), sp)
+	api.Demo(httpServer.Engine())
 
 	stopFn := transport.TransportController(httpServer)
 

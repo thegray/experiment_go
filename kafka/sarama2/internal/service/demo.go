@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"experiment_go/kafka/sarama1/internal/data/status"
-	"experiment_go/kafka/sarama1/internal/pkg/kafka"
 	"log"
 	"net/http"
 )
@@ -11,7 +10,7 @@ import (
 type Service struct {
 }
 
-func New(sp *kafka.SaramaProducer) Service {
+func New() Service {
 	return Service{}
 }
 

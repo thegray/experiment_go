@@ -3,7 +3,6 @@ package api
 import (
 	"experiment_go/kafka/sarama1/internal/data/dto"
 	"experiment_go/kafka/sarama1/internal/pkg/contextid"
-	"experiment_go/kafka/sarama1/internal/pkg/kafka"
 	"experiment_go/kafka/sarama1/internal/pkg/middleware"
 	"experiment_go/kafka/sarama1/internal/service"
 	"log"
@@ -16,9 +15,9 @@ type Integrator struct {
 	svc service.Service
 }
 
-func Demo(e *echo.Echo, sp *kafka.SaramaProducer) {
+func Demo(e *echo.Echo) {
 	ig := Integrator{
-		svc: service.New(sp),
+		svc: service.New(),
 	}
 
 	route := e.Group("/v1")
