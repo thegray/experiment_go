@@ -6,3 +6,12 @@ server:
   loglevel: INFO
   base_url: http://localhost:8080
   env: test
+
+sarama:
+	brokers: [http://localhost:9092]
+	log: true
+	certfile: 
+	keyfile:
+	cafile:
+	verifyssl:
+	topic: test1

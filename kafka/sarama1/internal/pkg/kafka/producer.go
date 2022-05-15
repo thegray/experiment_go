@@ -3,6 +3,7 @@ package kafka
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"experiment_go/kafka/sarama1/internal/data/dto"
 	"experiment_go/kafka/sarama1/internal/model"
 	"log"
 	"os"
@@ -14,6 +15,7 @@ import (
 type SaramaProducer struct {
 	SyncProducer  sarama.SyncProducer
 	AsyncProducer sarama.AsyncProducer
+	topic         string
 }
 
 func NewProducer(cfg model.SaramaConfig) *SaramaProducer {
@@ -21,14 +23,34 @@ func NewProducer(cfg model.SaramaConfig) *SaramaProducer {
 	producer := SaramaProducer{
 		SyncProducer:  initSyncProducer(cfg, tlsConfig),
 		AsyncProducer: initAsyncProducer(cfg, tlsConfig),
+		topic:         cfg.Topic,
 	}
 	return &producer
 }
 
-func (sp *SaramaProducer) SendMessage() {
+func (sp *SaramaProducer) SendMessage(msg dto.QueMessage) error {
+	partition, offset, err := sp.SyncProducer.SendMessage(&sarama.ProducerMessage{
+		Topic: sp.topic,
+		Value: sarama.StringEncoder(msg),
+	})
+
+	if err != nil {
+		log.Println("[KAFKA] Failed to queue message: ", err)
+		return err
+	}
+
+	log.Printf("[KAFKA] Message queued:/%d/%d", partition, offset)
+	return nil
 
 }
 
+func (sp *SaramaProducer) SendMessageToTopic(topic string, msg interface{}) error {
+	//todo: maybe there will be a case where this one is needed
+	log.Println("NOT YET IMPLEMENTED")
+	return nil
+}
+
+// close connection to kafka
 func (sp *SaramaProducer) Close() error {
 	if err := sp.SyncProducer.Close(); err != nil {
 		log.Println("[KAFKA] Failed to shutdown sync producer cleanly: ", err)
@@ -39,6 +61,7 @@ func (sp *SaramaProducer) Close() error {
 	return nil
 }
 
+// kafka TLS connection configuration stuff
 func createTlsConfiguration(cfg model.SaramaConfig) (t *tls.Config) {
 	if cfg.CertFile != "" && cfg.KeyFile != "" && cfg.CaFile != "" {
 		cert, err := tls.LoadX509KeyPair(cfg.CertFile, cfg.KeyFile)
@@ -63,6 +86,7 @@ func createTlsConfiguration(cfg model.SaramaConfig) (t *tls.Config) {
 	return t
 }
 
+// initialize sync producer
 func initSyncProducer(cfg model.SaramaConfig, tlsConfig *tls.Config) sarama.SyncProducer {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -81,6 +105,7 @@ func initSyncProducer(cfg model.SaramaConfig, tlsConfig *tls.Config) sarama.Sync
 	return producer
 }
 
+// initialize async producer
 func initAsyncProducer(cfg model.SaramaConfig, tlsConfig *tls.Config) sarama.AsyncProducer {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal
@@ -105,7 +130,3 @@ func initAsyncProducer(cfg model.SaramaConfig, tlsConfig *tls.Config) sarama.Asy
 
 	return producer
 }
-
-// SendMessage
-
-// close producer

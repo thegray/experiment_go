@@ -37,6 +37,12 @@ func (ig Integrator) receiveDemoMessage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	res, _ := ig.svc.ProcessDemoMessage(ctx, req.Msg)
+	res, err := ig.svc.ProcessDemoMessage(ctx, req.Msg)
+	if err != nil {
+
+		return c.JSON(http.StatusInternalServerError,
+			err, // just for demo, can present this error more proper and good
+		)
+	}
 	return c.JSON(res.Code, res)
 }

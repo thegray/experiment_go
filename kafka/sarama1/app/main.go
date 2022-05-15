@@ -42,11 +42,11 @@ func main() {
 	serverCfg := conf.GetGlobalConfig().ServerConfig
 	saramaCfg := conf.GetGlobalConfig().SaramaConfig
 
-	sp := kafka.NewProducer(saramaCfg)
+	saramaProd := kafka.NewProducer(saramaCfg)
 
 	httpServer := transport.NewServer(serverCfg)
 	api.HealthCheck(httpServer.Engine())
-	api.Demo(httpServer.Engine(), sp)
+	api.Demo(httpServer.Engine(), saramaProd)
 
 	stopFn := transport.TransportController(httpServer)
 
@@ -57,6 +57,5 @@ func main() {
 	logger.Info(fmt.Sprintf("exiting. received signal: %s", sig.String()))
 
 	stopFn(time.Duration(30) * time.Second)
-
-	// sarama obj close
+	saramaProd.Close()
 }

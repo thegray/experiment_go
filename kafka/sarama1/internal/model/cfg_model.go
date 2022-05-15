@@ -24,4 +24,5 @@ type SaramaConfig struct {
 	KeyFile     string   `yaml:"keyfile"`
 	CaFile      string   `yaml:"cafile"`
 	VerifySSL   bool     `yaml:"verifyssl"`
+	Topic       string   `yaml:"topic"`
 }
