@@ -1,12 +1,10 @@
 package middleware
 
 import (
-	"fmt"
-	"runtime/debug"
-
 	"experiment_go/kafka/sarama1/internal/pkg/contextid"
+	"fmt"
+	"log"
 
-	"git.sipp-now.com/spid/logger"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,10 +20,11 @@ func Recover() echo.MiddlewareFunc {
 						err = fmt.Errorf("%+v", r)
 					}
 
-					logger.Error(fmt.Sprintf("[HTTP:Recover] panic %s", err.Error()),
-						"context_id", contextid.Value(ctx),
-						"stacktrace", string(debug.Stack()),
-					)
+					log.Printf("[HTTP:Recover] panic %s %v", err.Error(), contextid.Value(ctx))
+					// logger.Error(fmt.Sprintf("[HTTP:Recover] panic %s", err.Error()),
+					// 	"context_id", contextid.Value(ctx),
+					// 	"stacktrace", string(debug.Stack()),
+					// )
 
 					c.Error(err)
 				}

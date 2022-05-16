@@ -1,11 +1,10 @@
 package middleware
 
 import (
+	"log"
 	"strconv"
 	"strings"
 	"time"
-
-	"git.sipp-now.com/spid/logger"
 
 	"experiment_go/kafka/sarama1/internal/pkg/contextid"
 
@@ -43,23 +42,25 @@ func Logger() echo.MiddlewareFunc {
 			requestCountMetrics.WithLabelValues(c.Request().URL.String(), strconv.Itoa(c.Response().Status)).Inc()
 
 			if c.Response().Status >= 500 {
-				logger.Error("[HTTP] Response",
-					"context_id", contextid.Value(ctx),
-					"url_path", c.Request().URL.String(),
-					"method", c.Request().Method,
-					"response_code", c.Response().Status,
-					"response_time", d,
-					"response_time_millis", d.Milliseconds(),
-				)
+				log.Printf("context_id %v", contextid.Value(ctx))
+				// logger.Error("[HTTP] Response",
+				// 	"context_id", contextid.Value(ctx),
+				// 	"url_path", c.Request().URL.String(),
+				// 	"method", c.Request().Method,
+				// 	"response_code", c.Response().Status,
+				// 	"response_time", d,
+				// 	"response_time_millis", d.Milliseconds(),
+				// )
 			} else {
-				logger.Info("[HTTP] Response",
-					"context_id", contextid.Value(ctx),
-					"url_path", c.Request().URL.String(),
-					"method", c.Request().Method,
-					"response_code", c.Response().Status,
-					"response_time", d,
-					"response_time_millis", d.Milliseconds(),
-				)
+				log.Printf("context_id %v", contextid.Value(ctx))
+				// logger.Info("[HTTP] Response",
+				// 	"context_id", contextid.Value(ctx),
+				// 	"url_path", c.Request().URL.String(),
+				// 	"method", c.Request().Method,
+				// 	"response_code", c.Response().Status,
+				// 	"response_time", d,
+				// 	"response_time_millis", d.Milliseconds(),
+				// )
 			}
 
 			return err
@@ -69,15 +70,16 @@ func Logger() echo.MiddlewareFunc {
 
 func BodyDumpHandler(c echo.Context, req []byte, resp []byte) {
 	ctx := GetContext(c)
+	log.Printf("context_id %v", contextid.Value(ctx))
 
-	logger.Info("[HTTP] Body Dump",
-		"context_id", contextid.Value(ctx),
-		"url_path", c.Request().URL.String(),
-		"method", c.Request().Method,
-		"request_body", string(req),
-		"response_code", c.Response().Status,
-		"response_body", string(resp),
-	)
+	// logger.Info("[HTTP] Body Dump",
+	// 	"context_id", contextid.Value(ctx),
+	// 	"url_path", c.Request().URL.String(),
+	// 	"method", c.Request().Method,
+	// 	"request_body", string(req),
+	// 	"response_code", c.Response().Status,
+	// 	"response_body", string(resp),
+	// )
 }
 
 func BodyDumpSkipper(c echo.Context) bool {

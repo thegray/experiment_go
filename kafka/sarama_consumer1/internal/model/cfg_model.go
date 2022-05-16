@@ -25,12 +25,12 @@ type SaramaConfig struct {
 	KeyFile     string   `yaml:"keyfile"`
 	CaFile      string   `yaml:"cafile"`
 	VerifySSL   bool     `yaml:"verifyssl"`
-	Topic       string   `yaml:"topic"`
 }
 
 type ConsumerConfig struct {
-	Version  string `yaml:"version"`
-	Strategy string `yaml:"strategy"`
-	Oldest   bool   `yaml:"oldest"` // kafka consumer behavior --from-beginning
-	Group    string `yaml:"group"`
+	Version  string   `yaml:"version"`
+	Strategy string   `yaml:"strategy"`
+	Oldest   bool     `yaml:"oldest"` // kafka consumer behavior --from-beginning
+	Group    string   `yaml:"group"`
+	Topics   []string `yaml:"topics"`
 }

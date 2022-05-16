@@ -7,12 +7,11 @@ import (
 	"experiment_go/kafka/sarama1/internal/pkg/transport"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"git.sipp-now.com/spid/logger"
 )
 
 var (
@@ -54,7 +53,8 @@ func main() {
 	signal.Notify(quit, syscall.SIGTERM, os.Interrupt)
 
 	sig := <-quit
-	logger.Info(fmt.Sprintf("exiting. received signal: %s", sig.String()))
+	log.Printf(fmt.Sprintf("exiting. received signal: %s", sig.String()))
+	// logger.Info(fmt.Sprintf("exiting. received signal: %s", sig.String()))
 
 	stopFn(time.Duration(30) * time.Second)
 	saramaProd.Close()

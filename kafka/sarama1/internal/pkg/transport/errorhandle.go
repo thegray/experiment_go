@@ -2,14 +2,13 @@ package transport
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"experiment_go/kafka/sarama1/internal/pkg/contextid"
 	general_error "experiment_go/kafka/sarama1/internal/pkg/errors"
 	"experiment_go/kafka/sarama1/internal/pkg/middleware"
-
-	"git.sipp-now.com/spid/logger"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -66,9 +65,10 @@ func (ce ErrHandler) Handler(err error, c echo.Context) {
 		errObj.Code = general_error.ErrInternalServerError.Error()
 		errObj.Message = fmt.Sprintf("%v", e.Message)
 
-		logger.Info(fmt.Sprintf("[ErrorHandler] %v", e.Message),
-			"context_id", contextid.Value(ctx),
-		)
+		log.Printf("[ErrorHandler] %v %v", e.Message, contextid.Value(ctx))
+		// logger.Info(fmt.Sprintf("[ErrorHandler] %v", e.Message),
+		// "context_id", contextid.Value(ctx),
+		// )
 	case validator.ValidationErrors:
 		var errMsg []string
 		for _, v := range e {
@@ -78,16 +78,18 @@ func (ce ErrHandler) Handler(err error, c echo.Context) {
 		errObj.Message = strings.Join(errMsg, ",")
 		code = http.StatusBadRequest
 
-		logger.Info(fmt.Sprintf("[ErrorHandler] %v", strings.Join(errMsg, ",")),
-			"context_id", contextid.Value(ctx),
-		)
+		log.Printf("[ErrorHandler] %v %v", strings.Join(errMsg, ","), contextid.Value(ctx))
+		// logger.Info(fmt.Sprintf("[ErrorHandler] %v", strings.Join(errMsg, ",")),
+		// 	"context_id", contextid.Value(ctx),
+		// )
 	default:
 		errObj.Code = general_error.ErrInternalServerError.Error()
 		errObj.Message = e.Error()
 
-		logger.Info(fmt.Sprintf("[ErrorHandler] %v", e.Error()),
-			"context_id", contextid.Value(ctx),
-		)
+		log.Printf("[ErrorHandler] %v %v", e.Error(), contextid.Value(ctx))
+		// logger.Info(fmt.Sprintf("[ErrorHandler] %v", e.Error()),
+		// 	"context_id", contextid.Value(ctx),
+		// )
 	}
 
 	r := resp{ErrorObj: errObj}

@@ -3,6 +3,7 @@ package kafka
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"experiment_go/kafka/sarama1/internal/data/dto"
 	"experiment_go/kafka/sarama1/internal/model"
 	"log"
@@ -29,9 +30,13 @@ func NewProducer(cfg model.SaramaConfig) *SaramaProducer {
 }
 
 func (sp *SaramaProducer) SendMessage(msg dto.QueMessage) error {
+	out, err := json.Marshal(msg)
+	if err != nil {
+		panic(err)
+	}
 	partition, offset, err := sp.SyncProducer.SendMessage(&sarama.ProducerMessage{
 		Topic: sp.topic,
-		Value: sarama.StringEncoder(msg),
+		Value: sarama.StringEncoder(out),
 	})
 
 	if err != nil {

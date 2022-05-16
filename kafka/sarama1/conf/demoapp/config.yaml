@@ -8,10 +8,10 @@ server:
   env: test
 
 sarama:
-	brokers: [http://localhost:9092]
-	log: true
-	certfile: 
-	keyfile:
-	cafile:
-	verifyssl:
-	topic: test1
+  brokers: [localhost:9092]
+  log: true
+  certfile: 
+  keyfile:
+  cafile:
+  verifyssl:
+  topic: my_topic
