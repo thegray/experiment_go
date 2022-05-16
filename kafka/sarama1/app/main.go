@@ -6,7 +6,6 @@ import (
 	"experiment_go/kafka/sarama1/internal/pkg/kafka"
 	"experiment_go/kafka/sarama1/internal/pkg/transport"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -16,22 +15,22 @@ import (
 
 var (
 	appName = flag.String("appname", "demoapp", "app name used to change config")
-	addr    = flag.String("addr", ":8080", "The address to bind to")
-	brokers = flag.String("brokers", "localhost:9092", "The Kafka brokers to connect to, as a comma separated list")
-	verbose = flag.Bool("verbose", false, "Turn on Sarama logging")
+	// addr    = flag.String("addr", ":8080", "The address to bind to")
+	// brokers = flag.String("brokers", "localhost:9092", "The Kafka brokers to connect to, as a comma separated list")
+	// verbose = flag.Bool("verbose", false, "Turn on Sarama logging")
 )
 
 func main() {
 	flag.Parse()
 
-	if *verbose {
-		// sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
-	}
+	// if *verbose {
+	// 	// sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
+	// }
 
-	if *brokers == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
+	// if *brokers == "" {
+	// 	flag.PrintDefaults()
+	// 	os.Exit(1)
+	// }
 
 	err := conf.InitServiceConfig(*appName)
 	if err != nil {
@@ -49,11 +48,11 @@ func main() {
 
 	stopFn := transport.TransportController(httpServer)
 
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, os.Interrupt)
 
 	sig := <-quit
-	log.Printf(fmt.Sprintf("exiting. received signal: %s", sig.String()))
+	log.Printf("exiting. received signal: %s", sig.String())
 	// logger.Info(fmt.Sprintf("exiting. received signal: %s", sig.String()))
 
 	stopFn(time.Duration(30) * time.Second)

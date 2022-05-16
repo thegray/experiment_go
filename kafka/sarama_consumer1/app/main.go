@@ -1,22 +1,21 @@
 package main
 
 import (
-	"context"
+	"experiment_go/kafka/sarama_consumer1/api"
 	"experiment_go/kafka/sarama_consumer1/internal/conf"
-	"experiment_go/kafka/sarama_consumer1/internal/pkg/kafka"
+	"experiment_go/kafka/sarama_consumer1/internal/pkg/transport"
 	"experiment_go/kafka/sarama_consumer1/internal/repo"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
-
-	ctx, cancel := context.WithCancel(context.Background())
 
 	err := conf.InitServiceConfig("workerapp")
 	if err != nil {
@@ -24,41 +23,28 @@ func main() {
 	}
 
 	appCfg := conf.GetGlobalConfig()
-	kafkaConsumer := repo.NewConsumerHandler()
-	kc := kafka.NewConsumer(ctx, appCfg.SaramaConfig, appCfg.ConsumerConfig, *kafkaConsumer)
 
-	<-kafkaConsumer.Ready
+	httpServer := transport.NewServer(appCfg.ServerConfig)
+	api.HealthCheck(httpServer.Engine())
+
+	consumerHandler := repo.NewConsumerHandler()
+	saramaConsumer := transport.NewConsumer(appCfg.SaramaConfig, appCfg.ConsumerConfig, *consumerHandler)
+
+	stopFn := transport.TransportController(
+		httpServer,
+		saramaConsumer,
+	)
+
+	<-consumerHandler.Ready
 	log.Println("Sarama consumer up and running!...")
 
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, os.Interrupt)
 
-	// keepRunning := true
-	// for keepRunning {
-	// 	select {
-	// 	case <-ctx.Done():
-	// 		log.Println("terminating: context cancelled")
-	// 		keepRunning = false
-	// 	case <-sigterm:
-	// 		log.Println("terminating: via signal")
-	// 		keepRunning = false
-	// 		// case <-sigusr1:
-	// 		// 	toggleConsumptionFlow(client, &consumptionIsPaused)
-	// 	}
-	// }
+	sig := <-quit
+	log.Printf("exiting. received signal: %s", sig.String())
 
-	defer func() {
-		log.Println("try to stop everything...")
-		cancel()
-		if err = kc.Close(); err != nil {
-			log.Panicf("Error closing kafka consumer: %v", err)
-		}
-	}()
-
-	e := echo.New()
-	e.GET("/", hello)
-	e.Start(appCfg.ServerConfig.Port)
-	// e.Logger.Fatal(e.Start(appCfg.ServerConfig.Port))
+	stopFn(time.Duration(30) * time.Second)
 }
 
 func hello(c echo.Context) error {
