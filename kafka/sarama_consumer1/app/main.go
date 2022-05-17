@@ -6,13 +6,10 @@ import (
 	"experiment_go/kafka/sarama_consumer1/internal/pkg/transport"
 	"experiment_go/kafka/sarama_consumer1/internal/repo"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -45,9 +42,4 @@ func main() {
 	log.Printf("exiting. received signal: %s", sig.String())
 
 	stopFn(time.Duration(30) * time.Second)
-}
-
-func hello(c echo.Context) error {
-	log.Print("hello called")
-	return c.String(http.StatusOK, "hello world")
 }
