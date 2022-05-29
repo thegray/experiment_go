@@ -5,6 +5,7 @@ import (
 	"experiment_go/kafka/sarama_consumer1/internal/conf"
 	"experiment_go/kafka/sarama_consumer1/internal/pkg/transport"
 	"experiment_go/kafka/sarama_consumer1/internal/repo"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -12,7 +13,14 @@ import (
 	"time"
 )
 
+var (
+	port  = flag.String("port", "", "the port")
+	topic = flag.String("topic", "", "topic name")
+	group = flag.String("group", "", "group name")
+)
+
 func main() {
+	flag.Parse()
 
 	err := conf.InitServiceConfig("workerapp")
 	if err != nil {
@@ -20,6 +28,20 @@ func main() {
 	}
 
 	appCfg := conf.GetGlobalConfig()
+
+	if *port != "" {
+		appCfg.ServerConfig.Port = *port
+	}
+
+	if *topic != "" {
+		s := make([]string, 1)
+		s[0] = *topic
+		appCfg.ConsumerConfig.Topics = s
+	}
+
+	if *group != "" {
+		appCfg.ConsumerConfig.Group = *group
+	}
 
 	httpServer := transport.NewServer(appCfg.ServerConfig)
 	api.HealthCheck(httpServer.Engine())

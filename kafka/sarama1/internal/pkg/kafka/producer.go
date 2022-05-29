@@ -44,7 +44,7 @@ func (sp *SaramaProducer) SendMessage(msg dto.QueMessage) error {
 		return err
 	}
 
-	log.Printf("[KAFKA] Message queued:/%d/%d", partition, offset)
+	log.Printf("[KAFKA] Message queued partition: %d offset: %d", partition, offset)
 	return nil
 
 }
@@ -97,6 +97,8 @@ func initSyncProducer(cfg model.SaramaConfig, tlsConfig *tls.Config) sarama.Sync
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 10
 	config.Producer.Return.Successes = true
+	config.Producer.Partitioner = sarama.NewRoundRobinPartitioner
+	// config.Producer.Partitioner = sarama.NewRandomPartitioner
 
 	if tlsConfig != nil {
 		config.Net.TLS.Config = tlsConfig

@@ -1,12 +1,9 @@
 package middleware
 
 import (
-	"log"
 	"strconv"
 	"strings"
 	"time"
-
-	"experiment_go/kafka/sarama1/internal/pkg/contextid"
 
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
@@ -32,7 +29,7 @@ func Logger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			now := time.Now()
-			ctx := GetContext(c)
+			// ctx := GetContext(c)
 
 			err := next(c)
 			d := time.Since(now)
@@ -41,27 +38,27 @@ func Logger() echo.MiddlewareFunc {
 			latencyMetrics.WithLabelValues(c.Request().URL.String()).Observe(elapsed)
 			requestCountMetrics.WithLabelValues(c.Request().URL.String(), strconv.Itoa(c.Response().Status)).Inc()
 
-			if c.Response().Status >= 500 {
-				log.Printf("context_id %v", contextid.Value(ctx))
-				// logger.Error("[HTTP] Response",
-				// 	"context_id", contextid.Value(ctx),
-				// 	"url_path", c.Request().URL.String(),
-				// 	"method", c.Request().Method,
-				// 	"response_code", c.Response().Status,
-				// 	"response_time", d,
-				// 	"response_time_millis", d.Milliseconds(),
-				// )
-			} else {
-				log.Printf("context_id %v", contextid.Value(ctx))
-				// logger.Info("[HTTP] Response",
-				// 	"context_id", contextid.Value(ctx),
-				// 	"url_path", c.Request().URL.String(),
-				// 	"method", c.Request().Method,
-				// 	"response_code", c.Response().Status,
-				// 	"response_time", d,
-				// 	"response_time_millis", d.Milliseconds(),
-				// )
-			}
+			// if c.Response().Status >= 500 {
+			// 	log.Printf("context_id %v", contextid.Value(ctx))
+			// 	logger.Error("[HTTP] Response",
+			// 		"context_id", contextid.Value(ctx),
+			// 		"url_path", c.Request().URL.String(),
+			// 		"method", c.Request().Method,
+			// 		"response_code", c.Response().Status,
+			// 		"response_time", d,
+			// 		"response_time_millis", d.Milliseconds(),
+			// 	)
+			// } else {
+			// 	log.Printf("context_id %v", contextid.Value(ctx))
+			// 	logger.Info("[HTTP] Response",
+			// 		"context_id", contextid.Value(ctx),
+			// 		"url_path", c.Request().URL.String(),
+			// 		"method", c.Request().Method,
+			// 		"response_code", c.Response().Status,
+			// 		"response_time", d,
+			// 		"response_time_millis", d.Milliseconds(),
+			// 	)
+			// }
 
 			return err
 		}
@@ -69,8 +66,8 @@ func Logger() echo.MiddlewareFunc {
 }
 
 func BodyDumpHandler(c echo.Context, req []byte, resp []byte) {
-	ctx := GetContext(c)
-	log.Printf("context_id %v", contextid.Value(ctx))
+	// ctx := GetContext(c)
+	// log.Printf("context_id %v", contextid.Value(ctx))
 
 	// logger.Info("[HTTP] Body Dump",
 	// 	"context_id", contextid.Value(ctx),

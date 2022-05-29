@@ -2,7 +2,6 @@ package api
 
 import (
 	"experiment_go/kafka/sarama1/internal/data/dto"
-	"experiment_go/kafka/sarama1/internal/pkg/contextid"
 	"experiment_go/kafka/sarama1/internal/pkg/kafka"
 	"experiment_go/kafka/sarama1/internal/pkg/middleware"
 	"experiment_go/kafka/sarama1/internal/service"
@@ -30,7 +29,7 @@ func (ig Integrator) receiveDemoMessage(c echo.Context) error {
 	var req dto.MessageDemo
 	if err := c.Bind(&req); err != nil {
 		log.Println("request data invalid",
-			"context_id", contextid.Value(ctx),
+			// "context_id", contextid.Value(ctx),
 			"error", err.Error(),
 		)
 
