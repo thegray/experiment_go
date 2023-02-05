@@ -1,0 +1,39 @@
+server:
+  read_timeout_seconds: 10
+  write_timeout_seconds: 65
+  time_zone: "Asia/Jakarta"
+  loglevel: INFO
+  env: DEV
+  merchant_id: DEVTOOLS
+
+logger: # example config
+  enable_stdout: True
+  enable_logfile: True
+  caller_skipset: True
+  caller_skip: 2
+  logfile_configs:
+    - levels:
+        - warn
+        - error
+        - dpanic
+        - panic
+        - fatal
+      fullpath_filename: ./log/error.log
+      is_access_log: False
+      max_size: 500
+      max_age: 7
+      max_backups: 0
+      local_time: True
+      compress: False
+    - levels:
+        - debug
+        - info
+      fullpath_filename: ./log/data.log
+      is_access_log: False
+      max_size: 500
+      max_age: 7
+      max_backups: 0
+      local_time: True
+      compress: False
+
+## WS Later
